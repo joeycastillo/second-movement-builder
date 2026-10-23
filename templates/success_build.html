@@ -11,7 +11,7 @@ iframe {
 <body> 
 <h3><a href='/'>Home</a></h3> 
 <h3><a href='build-<%= makeargs['BOARD'] %>_<%= makeargs['DISPLAY'] %>/firmware.uf2'>Download</a></h3> 
-<iframe height='800' src='build-sim/firmware.html'></iframe> 
+<iframe height='800' src='build-sim-<%= makeargs['BOARD'] %>_<%= makeargs['DISPLAY'] %>/firmware.html'></iframe> 
 <h2>stdout</h2>
 <pre><%= stdout %></pre>
 <h2>stderr</h2>

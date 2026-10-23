@@ -1,6 +1,6 @@
 FROM openresty/openresty:bookworm
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 
 # These should all be one big install,
 # but the fly.io registry kept dying on big layer transfers...
@@ -23,7 +23,7 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
-  apt-get install -y --no-install-recommends llvm lld & \
+  apt-get install -y --no-install-recommends llvm lld && \
   rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
@@ -40,16 +40,23 @@ RUN apt-get update && \
 #ENV EM_CONFIG /emconfig
 #RUN emcc --generate-config
 
-RUN git clone https://github.com/joeycastillo/second-movement.git
+RUN git clone https://github.com/joeycastillo/second-movement.git /second-movement
 
-WORKDIR second-movement/
+WORKDIR /second-movement
 
-RUN git submodule update --init
+RUN git submodule update --init && git config --system --add safe.directory /second-movement
 
 COPY *.patch ./
 RUN for f in *.patch; do patch -p1 < "$f"; done
 
-RUN emmake make 'BUILD=build-sim' BOARD=sensorwatch_red DISPLAY=custom
+RUN emmake make 'BUILD=build-sim-sensorwatch_red_classic' BOARD=sensorwatch_red DISPLAY=classic
+RUN emmake make 'BUILD=build-sim-sensorwatch_green_classic' BOARD=sensorwatch_green DISPLAY=classic
+RUN emmake make 'BUILD=build-sim-sensorwatch_blue_classic' BOARD=sensorwatch_blue DISPLAY=classic
+RUN emmake make 'BUILD=build-sim-sensorwatch_pro_classic' BOARD=sensorwatch_pro DISPLAY=classic
+RUN emmake make 'BUILD=build-sim-sensorwatch_red_custom' BOARD=sensorwatch_red DISPLAY=custom
+RUN emmake make 'BUILD=build-sim-sensorwatch_green_custom' BOARD=sensorwatch_green DISPLAY=custom
+RUN emmake make 'BUILD=build-sim-sensorwatch_blue_custom' BOARD=sensorwatch_blue DISPLAY=custom
+RUN emmake make 'BUILD=build-sim-sensorwatch_pro_custom' BOARD=sensorwatch_pro DISPLAY=custom
 RUN make 'BUILD=build-sensorwatch_red_classic' BOARD=sensorwatch_red DISPLAY=classic
 RUN make 'BUILD=build-sensorwatch_green_classic' BOARD=sensorwatch_green DISPLAY=classic
 RUN make 'BUILD=build-sensorwatch_blue_classic' BOARD=sensorwatch_blue DISPLAY=classic
